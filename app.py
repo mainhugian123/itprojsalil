@@ -1,7 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, sessions
 from flask_bootstrap import Bootstrap 
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email, Length, AnyOf
 
@@ -17,11 +17,11 @@ class User(db.Model):
 	email = db.Column(db.String())
 	password = db.Column(db.String(80))
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
 	username = StringField('Username', validators=[InputRequired(), Length(min=1, max=20)])
 	password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
 	remember = BooleanField('Remember me')
-class SignUpForm(Form):
+class SignUpForm(FlaskForm):
 	name = StringField('Name', validators=[InputRequired()])
 	username = StringField('Username', validators=[InputRequired(), Length(min=1, max=20)])
 	email = StringField('Email', validators=[InputRequired(), Email('Invalid email')])
@@ -40,9 +40,9 @@ def login():
 def signup():
 	form = SignUpForm()
 	if form.validate_on_submit():
-		new_user = User(name = form.name.data,username = form.username.data, email = form.email.data, password = form.password.data)
+		new_user = User(name=form.name.data, username=form.username.data, email=form.email.data, password=form.password.data)
 		db.session.add(new_user)
-		db.session.commit
+		db.session.commit()
 		return "New User Has been created."
 	return render_template('signup.html',form=form)
 if __name__=='__main__':
